@@ -103,18 +103,13 @@ class BatchHardTripletLoss(nn.Module):
         max_anchor_negative_dist = pairwise_dist.max(1, True)[0]
         anchor_negative_dist = pairwise_dist + max_anchor_negative_dist * (1.0 - mask_anchor_negative.float())
         hardest_negative_dist = anchor_negative_dist.min(1, True)[0]
-        # print(hardest_negative_dist.shape, hardest_positive_dist.shape)
-        # print("************************")
 
-        # print(anchor_positive_dist)
-        # print("********************")
-        # print(hardest_positive_dist)
 
         # loss = F.relu(torch.logsumexp(self.gamma*(hardest_negative_dist-hardest_positive_dist+self.margin), dim=0))
         # return loss
 
 
-
+''' Circle Loss '''
         sp = anchor_positive_dist
         sn = anchor_negative_dist
         ap = torch.clamp_min(-anchor_positive_dist + 1 + self.margin, min=0.)
@@ -129,10 +124,13 @@ class BatchHardTripletLoss(nn.Module):
         loss = self.soft_plus(torch.logsumexp(logit_n, dim=0) + torch.logsumexp(logit_p, dim=0))
         # print(loss.shape)
         return loss.mean()
+
+''' Circle Loss End '''
         # loss = torch.log(1+torch.sum(torch.exp(self.gamma*(hardest_negative_dist - hardest_positive_dist + self.margin))))
         # return loss
+
+''' Original Triplet Loss: Uncomment next two lines for Triplet Loss '''
         # loss = (F.relu(hardest_positive_dist - hardest_negative_dist + self.margin))
-        # print(loss.shape)
         # return loss.mean()
 
 
