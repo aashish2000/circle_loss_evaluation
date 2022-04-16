@@ -1,6 +1,6 @@
 import argparse
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1, 2, 3"
+#os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1, 3"
 import pandas as pd
 import torch
 from thop import profile, clever_format
