@@ -83,13 +83,14 @@ if __name__ == '__main__':
     parser.add_argument('--temperature', default=0.5, type=float,
                         help='temperature scaling used in softmax cross-entropy loss')
     parser.add_argument('--margin', default=0.1, type=float, help='margin of m for triplet loss')
+    parser.add_argument('--gamma', default=10, type=float, help='gamma for circle loss')
     parser.add_argument('--recalls', default='1,2,4,8', type=str, help='selected recall')
     parser.add_argument('--batch_size', default=128, type=int, help='train batch size')
     parser.add_argument('--num_epochs', default=20, type=int, help='train epoch number')
 
     opt = parser.parse_args()
     # args parse
-    gamma = 10
+    gamma = opt.gamma
     data_path, data_name, crop_type, backbone_type = opt.data_path, opt.data_name, opt.crop_type, opt.backbone_type
     gd_config, feature_dim, smoothing, temperature = opt.gd_config, opt.feature_dim, opt.smoothing, opt.temperature
     margin, recalls, batch_size = opt.margin, [int(k) for k in opt.recalls.split(',')], opt.batch_size
