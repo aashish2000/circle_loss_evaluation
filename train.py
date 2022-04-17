@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from model import Model, set_bn_eval
-from utils import recall, LabelSmoothingCrossEntropyLoss, BatchHardTripletLoss, ImageReader, MPerClassSampler
+from utils import recall, acc, LabelSmoothingCrossEntropyLoss, BatchHardTripletLoss, ImageReader, MPerClassSampler
 
 # import torch.distributed as dist
 # dist.init_process_group('gloo', init_method='file:///tmp/somefile', rank=0, world_size=1)
@@ -56,14 +56,18 @@ def test(net, recall_ids):
         if data_name == 'isc':
             acc_list = recall(eval_dict['test']['features'], test_data_set.labels, recall_ids,
                               eval_dict['gallery']['features'], gallery_data_set.labels)
+            prec_list = acc(eval_dict['test']['features'], test_data_set.labels, recall_ids,
+                              eval_dict['gallery']['features'], gallery_data_set.labels)
         else:
             acc_list = recall(eval_dict['test']['features'], test_data_set.labels, recall_ids)
+            prec_list = acc(eval_dict['test']['features'], test_data_set.labels, recall_ids)
+
     desc = 'Test Epoch {}/{} '.format(epoch, num_epochs)
     for index, rank_id in enumerate(recall_ids):
         desc += 'R@{}:{:.2f}% '.format(rank_id, acc_list[index] * 100)
         results['test_recall@{}'.format(rank_id)].append(acc_list[index] * 100)
     print(desc)
-    return acc_list[0]
+    return acc_list[0], prec_list[0]
 
 
 if __name__ == '__main__':
@@ -128,12 +132,13 @@ if __name__ == '__main__':
     feature_criterion = BatchHardTripletLoss(margin=margin, gamma=gamma)
 
     best_recall = 0.0
+    best_prec = 0.0
     print(best_recall)
     for epoch in range(1, num_epochs + 1):
         train_loss, train_accuracy = train(model, optimizer)
         results['train_loss'].append(train_loss)
         results['train_accuracy'].append(train_accuracy)
-        rank = test(model, recalls)
+        rank, prec = test(model, recalls)
         lr_scheduler.step()
 
         # save statistics
@@ -141,8 +146,9 @@ if __name__ == '__main__':
         data_frame.to_csv('results/{}_statistics.csv'.format(save_name_pre), index_label='epoch')
         # save database and model
         data_base = {}
-        if rank > best_recall:
+        if rank > best_recall and prec > best_prec:
             best_recall = rank
+            best_prec = prec
             data_base['test_images'] = test_data_set.images
             data_base['test_labels'] = test_data_set.labels
             data_base['test_features'] = eval_dict['test']['features']
