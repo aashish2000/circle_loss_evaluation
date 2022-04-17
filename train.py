@@ -67,7 +67,7 @@ def test(net, recall_ids):
         desc += 'R@{}:{:.2f}% '.format(rank_id, acc_list[index] * 100)
         results['test_recall@{}'.format(rank_id)].append(acc_list[index] * 100)
         desc += 'P@{}:{:.2f}% '.format(rank_id, prec_list[index] * 100)
-        results['test_Precision@{}'.format(rank_id)].append(prec_list[index] * 100)
+        results['test_precision@{}'.format(rank_id)].append(prec_list[index] * 100)
     print(desc)
     return acc_list[0], prec_list[0]
 
@@ -107,6 +107,7 @@ if __name__ == '__main__':
     results = {'train_loss': [], 'train_accuracy': []}
     for recall_id in recalls:
         results['test_recall@{}'.format(recall_id)] = []
+        results['test_precision@{}'.format(recall_id)] = []
 
     # dataset loader
     train_data_set = ImageReader(data_path, data_name, 'train', crop_type)
