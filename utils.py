@@ -83,8 +83,8 @@ def recall(feature_vectors, feature_labels, rank, gallery_vectors=None, gallery_
         y_pred = (gallery_labels[idx[:, r-1:r]]).cpu().numpy()
         y_true = feature_labels.unsqueeze(dim=-1).cpu().numpy()
 
-        correct_1 = (gallery_labels[idx[:, 0:r]] == feature_labels.unsqueeze(dim=-1)).any(dim=-1)).float()
-        correct_2 = (gallery_labels[idx[:, r-1:r]] == feature_labels.unsqueeze(dim=-1)).any(dim=-1)).float()
+        correct_1 = (gallery_labels[idx[:, 0:r]] == feature_labels.unsqueeze(dim=-1)).any(dim=-1).float()
+        correct_2 = (gallery_labels[idx[:, r-1:r]] == feature_labels.unsqueeze(dim=-1)).any(dim=-1).float()
         print(correct_1)
         print(correct_2)
         acc_list.append(metrics.recall_score(y_true, y_pred, average='weighted'))
