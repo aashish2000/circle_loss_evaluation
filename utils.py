@@ -53,10 +53,10 @@ def precision(feature_vectors, feature_labels, rank, gallery_vectors=None, galle
     acc_list = []
     prec_list = []
     for r in rank:
-        #y_pred = (gallery_labels[idx[:, r-1:r]]).cpu().numpy()
-        #y_true = feature_labels.unsqueeze(dim=-1).cpu().numpy()
-        y_pred = (gallery_labels[idx[:, 0:r]] == feature_labels.unsqueeze(dim=-1)).any(dim=-1).float().cpu().numpy()
-        y_true = torch.ones_like(feature_labels).cpu().numpy()
+        y_pred = (gallery_labels[idx[:, r-1:r]]).cpu().numpy()
+        y_true = feature_labels.unsqueeze(dim=-1).cpu().numpy()
+        #y_pred = (gallery_labels[idx[:, 0:r]] == feature_labels.unsqueeze(dim=-1)).any(dim=-1).float().cpu().numpy()
+        #y_true = torch.ones_like(feature_labels).cpu().numpy()
 
         #acc_list.append(metrics.recall_score(y_true, y_pred, average='weighted'))
         prec_list.append(metrics.precision_score(y_true, y_pred, average='weighted'))
