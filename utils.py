@@ -6,7 +6,7 @@ from torch.nn import functional as F
 from torch.utils.data import Dataset
 from torch.utils.data.sampler import Sampler
 from torchvision import transforms
-
+from sklearn import metrics
 
 class ImageReader(Dataset):
 
@@ -36,7 +36,7 @@ class ImageReader(Dataset):
     def __len__(self):
         return len(self.images)
 
-def acc(feature_vectors, feature_labels, rank, gallery_vectors=None, gallery_labels=None):
+def precision(feature_vectors, feature_labels, rank, gallery_vectors=None, gallery_labels=None):
     num_features = len(feature_labels)
     feature_labels = torch.tensor(feature_labels, device=feature_vectors.device)
     gallery_vectors = feature_vectors if gallery_vectors is None else gallery_vectors
@@ -53,7 +53,7 @@ def acc(feature_vectors, feature_labels, rank, gallery_vectors=None, gallery_lab
     acc_list = []
     prec_list = []
     for r in rank:
-        y_pred = (gallery_labels[idx[:, 0:r]]).cpu().numpy()
+        y_pred = (gallery_labels[idx[:, r-1:r]]).cpu().numpy()
         y_true = feature_labels.unsqueeze(dim=-1).cpu().numpy()
 
         #acc_list.append(metrics.recall_score(y_true, y_pred, average='weighted'))
@@ -80,7 +80,7 @@ def recall(feature_vectors, feature_labels, rank, gallery_vectors=None, gallery_
     acc_list = []
     prec_list = []
     for r in rank:
-        y_pred = (gallery_labels[idx[:, 0:r]]).cpu().numpy()
+        y_pred = (gallery_labels[idx[:, r-1:r]]).cpu().numpy()
         y_true = feature_labels.unsqueeze(dim=-1).cpu().numpy()
 
         acc_list.append(metrics.recall_score(y_true, y_pred, average='weighted'))

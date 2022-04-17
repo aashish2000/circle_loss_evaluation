@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from model import Model, set_bn_eval
-from utils import recall, acc, LabelSmoothingCrossEntropyLoss, BatchHardTripletLoss, ImageReader, MPerClassSampler
+from utils import recall, precision, LabelSmoothingCrossEntropyLoss, BatchHardTripletLoss, ImageReader, MPerClassSampler
 
 # import torch.distributed as dist
 # dist.init_process_group('gloo', init_method='file:///tmp/somefile', rank=0, world_size=1)
@@ -56,16 +56,18 @@ def test(net, recall_ids):
         if data_name == 'isc':
             acc_list = recall(eval_dict['test']['features'], test_data_set.labels, recall_ids,
                               eval_dict['gallery']['features'], gallery_data_set.labels)
-            prec_list = acc(eval_dict['test']['features'], test_data_set.labels, recall_ids,
+            prec_list = precision(eval_dict['test']['features'], test_data_set.labels, recall_ids,
                               eval_dict['gallery']['features'], gallery_data_set.labels)
         else:
             acc_list = recall(eval_dict['test']['features'], test_data_set.labels, recall_ids)
-            prec_list = acc(eval_dict['test']['features'], test_data_set.labels, recall_ids)
+            prec_list = precision(eval_dict['test']['features'], test_data_set.labels, recall_ids)
 
     desc = 'Test Epoch {}/{} '.format(epoch, num_epochs)
     for index, rank_id in enumerate(recall_ids):
         desc += 'R@{}:{:.2f}% '.format(rank_id, acc_list[index] * 100)
         results['test_recall@{}'.format(rank_id)].append(acc_list[index] * 100)
+        desc += 'P@{}:{:.2f}% '.format(rank_id, prec_list[index] * 100)
+        results['test_Precision@{}'.format(rank_id)].append(prec_list[index] * 100)
     print(desc)
     return acc_list[0], prec_list[0]
 
