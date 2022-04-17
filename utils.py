@@ -89,7 +89,7 @@ def recall(feature_vectors, feature_labels, rank, gallery_vectors=None, gallery_
         #correct_2 = (gallery_labels[idx[:, r-1:r]] == feature_labels.unsqueeze(dim=-1)).any(dim=-1).float()
         #print(correct_1)
         #print(correct_2)
-        y_true = (gallery_labels[idx[:, 0:r]] == feature_labels.unsqueeze(dim=-1)).any(dim=-1)
+        y_true = (gallery_labels[idx[:, 0:r]] == feature_labels.unsqueeze(dim=-1)).any(dim=-1).float()
         y_pred = torch.ones_like(feature_labels)
         print(y_true)
         print(y_pred)
