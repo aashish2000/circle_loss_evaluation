@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from model import Model, set_bn_eval
-from utils import recall, precision, LabelSmoothingCrossEntropyLoss, BatchHardTripletLoss, ImageReader, MPerClassSampler
+from utils import recall_precision, recall, precision, LabelSmoothingCrossEntropyLoss, BatchHardTripletLoss, ImageReader, MPerClassSampler
 
 # import torch.distributed as dist
 # dist.init_process_group('gloo', init_method='file:///tmp/somefile', rank=0, world_size=1)
@@ -59,8 +59,8 @@ def test(net, recall_ids):
             prec_list = precision(eval_dict['test']['features'], test_data_set.labels, recall_ids,
                               eval_dict['gallery']['features'], gallery_data_set.labels)
         else:
-            acc_list = recall(eval_dict['test']['features'], test_data_set.labels, recall_ids)
-            prec_list = precision(eval_dict['test']['features'], test_data_set.labels, recall_ids)
+            acc_list, prec_list = recall_precision(eval_dict['test']['features'], test_data_set.labels, recall_ids)
+            
 
     desc = 'Test Epoch {}/{} '.format(epoch, num_epochs)
     for index, rank_id in enumerate(recall_ids):

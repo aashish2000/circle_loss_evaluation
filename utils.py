@@ -103,6 +103,37 @@ def recall(feature_vectors, feature_labels, rank, gallery_vectors=None, gallery_
         #acc_list.append((torch.sum(correct) / num_features).item())
     return acc_list
 
+def recall_precision(feature_vectors, feature_labels, rank, gallery_vectors=None, gallery_labels=None):
+    num_features = len(feature_labels)
+    feature_labels = torch.tensor(feature_labels, device=feature_vectors.device)
+    gallery_vectors = feature_vectors if gallery_vectors is None else gallery_vectors
+
+    dist_matrix = torch.cdist(feature_vectors.unsqueeze(0), gallery_vectors.unsqueeze(0)).squeeze(0)
+    print(dist_matrix)
+    print(dist_matrix.shape)
+    if gallery_labels is None:
+        dist_matrix.fill_diagonal_(float('inf'))
+        gallery_labels = feature_labels
+    else:
+        gallery_labels = torch.tensor(gallery_labels, device=feature_vectors.device)
+
+    idx = dist_matrix.topk(k=rank[-1], dim=-1, largest=False)[1]
+    acc_list = []
+    prec_list = []
+    for r in rank:
+        correct = (gallery_labels[idx[:, 0:r]] == feature_labels.unsqueeze(dim=-1)).any(dim=-1).float()
+        acc_list.append((torch.sum(correct) / num_features).item())
+
+        incorrect = (gallery_labels[idx[:, 0:r]] != feature_labels.unsqueeze(dim=-1)).any(dim=-1).float()
+        print("feature Label ", feature_labels.unsqueeze(dim=-1).shape)
+        print(correct.shape, gallery_labels[idx[:, 0:r]].shape)
+
+        tpfp = torch.sum(correct) + torch.sum(incorrect)
+        prec_list.append((torch.sum(correct) / tpfp).item())
+
+
+    return acc_list, prec_list
+
 
 class LabelSmoothingCrossEntropyLoss(nn.Module):
     def __init__(self, smoothing=0.1, temperature=1.0):
