@@ -36,72 +36,6 @@ class ImageReader(Dataset):
     def __len__(self):
         return len(self.images)
 
-def precision(feature_vectors, feature_labels, rank, gallery_vectors=None, gallery_labels=None):
-    num_features = len(feature_labels)
-    feature_labels = torch.tensor(feature_labels, device=feature_vectors.device)
-    gallery_vectors = feature_vectors if gallery_vectors is None else gallery_vectors
-
-    dist_matrix = torch.cdist(feature_vectors.unsqueeze(0), gallery_vectors.unsqueeze(0)).squeeze(0)
-
-    if gallery_labels is None:
-        dist_matrix.fill_diagonal_(float('inf'))
-        gallery_labels = feature_labels
-    else:
-        gallery_labels = torch.tensor(gallery_labels, device=feature_vectors.device)
-
-    idx = dist_matrix.topk(k=rank[-1], dim=-1, largest=False)[1]
-    acc_list = []
-    prec_list = []
-    for r in rank:
-        y_pred = (gallery_labels[idx[:, r-1:r]]).cpu().numpy()
-        y_true = feature_labels.unsqueeze(dim=-1).cpu().numpy()
-        #y_pred = (gallery_labels[idx[:, 0:r]] == feature_labels.unsqueeze(dim=-1)).any(dim=-1).float().cpu().numpy()
-        #y_true = torch.ones_like(feature_labels).cpu().numpy()
-
-        #acc_list.append(metrics.recall_score(y_true, y_pred, average='weighted'))
-        prec_list.append(metrics.precision_score(y_true, y_pred, average='weighted'))
-        #print(metrics.precision_score(y_true, y_pred, average='None'))
-        #correct = (gallery_labels[idx[:, 0:r]] == feature_labels.unsqueeze(dim=-1)).any(dim=-1).float()
-        #acc_list.append((torch.sum(correct) / num_features).item())
-    return prec_list
-
-def recall(feature_vectors, feature_labels, rank, gallery_vectors=None, gallery_labels=None):
-    num_features = len(feature_labels)
-    feature_labels = torch.tensor(feature_labels, device=feature_vectors.device)
-    gallery_vectors = feature_vectors if gallery_vectors is None else gallery_vectors
-
-    dist_matrix = torch.cdist(feature_vectors.unsqueeze(0), gallery_vectors.unsqueeze(0)).squeeze(0)
-
-    if gallery_labels is None:
-        dist_matrix.fill_diagonal_(float('inf'))
-        gallery_labels = feature_labels
-    else:
-        gallery_labels = torch.tensor(gallery_labels, device=feature_vectors.device)
-
-    idx = dist_matrix.topk(k=rank[-1], dim=-1, largest=False)[1]
-    acc_list = []
-    prec_list = []
-    for r in rank:
-        #y_pred = (gallery_labels[idx[:, r-1:r]]).cpu().numpy()
-        #y_true = feature_labels.unsqueeze(dim=-1).cpu().numpy()
-
-        #print(gallery_labels[idx[:, 0:r]])
-        #print(feature_labels.unsqueeze(dim=-1))
-        #correct_1 = (gallery_labels[idx[:, 0:r]] == feature_labels.unsqueeze(dim=-1)).any(dim=-1).float()
-        #correct_2 = (gallery_labels[idx[:, r-1:r]] == feature_labels.unsqueeze(dim=-1)).any(dim=-1).float()
-        #print(correct_1)
-        #print(correct_2)
-        y_pred = (gallery_labels[idx[:, 0:r]] == feature_labels.unsqueeze(dim=-1)).any(dim=-1).float().cpu().numpy()
-        y_true = torch.ones_like(feature_labels).cpu().numpy()
-        print(y_true)
-        print(y_pred)
-        #metrics.recall_score(y_true, y_pred, average='weighted')
-        acc_list.append(metrics.recall_score(y_true, y_pred, average='weighted'))
-        #prec_list.append(metrics.precision_score(y_true, y_pred, average='weighted'))
-        #print(metrics.precision_score(y_true, y_pred, average='None'))
-        #correct = (gallery_labels[idx[:, 0:r]] == feature_labels.unsqueeze(dim=-1)).any(dim=-1).float()
-        #acc_list.append((torch.sum(correct) / num_features).item())
-    return acc_list
 
 def recall_precision(feature_vectors, feature_labels, rank, gallery_vectors=None, gallery_labels=None):
     num_features = len(feature_labels)
@@ -125,8 +59,8 @@ def recall_precision(feature_vectors, feature_labels, rank, gallery_vectors=None
         acc_list.append((torch.sum(correct) / num_features).item())
 
         incorrect = (gallery_labels[idx[:, 0:r]] != feature_labels.unsqueeze(dim=-1)).any(dim=-1).float()
-        print("feature Label ", feature_labels.unsqueeze(dim=-1).shape)
-        print(correct.shape, gallery_labels[idx[:, 0:r]].shape)
+        # print("feature Label ", feature_labels.unsqueeze(dim=-1).shape)
+        # print(correct.shape, gallery_labels[idx[:, 0:r]].shape)
 
         tpfp = torch.sum(correct) + torch.sum(incorrect)
         prec_list.append((torch.sum(correct) / tpfp).item())
@@ -150,11 +84,12 @@ class LabelSmoothingCrossEntropyLoss(nn.Module):
 
 
 class BatchHardTripletLoss(nn.Module):
-    def __init__(self, margin=1.0, gamma = 80):
+    def __init__(self, margin=1.0, gamma = 80, loss_name = "circle"):
         super().__init__()
         self.margin = margin
         self.gamma = gamma 
         self.soft_plus = nn.Softplus()
+        self.loss_name = loss_name
 
     @staticmethod
     def get_anchor_positive_triplet_mask(target):
@@ -185,29 +120,25 @@ class BatchHardTripletLoss(nn.Module):
         # loss = F.relu(torch.logsumexp(self.gamma*(hardest_negative_dist-hardest_positive_dist+self.margin), dim=0))
         # return loss
 
+        if(self.loss_name == "circle"):
+            sp = anchor_positive_dist
+            sn = anchor_negative_dist
+            ap = torch.clamp_min(-anchor_positive_dist + 1 + self.margin, min=0.)
+            an = torch.clamp_min(anchor_negative_dist + self.margin, min=0.)
 
-# Circle Loss
-        sp = anchor_positive_dist
-        sn = anchor_negative_dist
-        ap = torch.clamp_min(-anchor_positive_dist + 1 + self.margin, min=0.)
-        an = torch.clamp_min(anchor_negative_dist + self.margin, min=0.)
+            delta_p = 1 - self.margin
+            delta_n = self.margin
 
-        delta_p = 1 - self.margin
-        delta_n = self.margin
+            logit_p = - ap * (sp - delta_p) * self.gamma
+            logit_n = an * (sn - delta_n) * self.gamma
 
-        logit_p = - ap * (sp - delta_p) * self.gamma
-        logit_n = an * (sn - delta_n) * self.gamma
+            loss = self.soft_plus(torch.logsumexp(logit_n, dim=0) + torch.logsumexp(logit_p, dim=0))
+            # print(loss.shape)
+            return loss.mean()
 
-        loss = self.soft_plus(torch.logsumexp(logit_n, dim=0) + torch.logsumexp(logit_p, dim=0))
-        # print(loss.shape)
-        return loss.mean()
-# Circle Loss End 
-        # loss = torch.log(1+torch.sum(torch.exp(self.gamma*(hardest_negative_dist - hardest_positive_dist + self.margin))))
-        # return loss
-
-# Original Triplet Loss: Uncomment next two lines for Triplet Loss '''
-        # loss = (F.relu(hardest_positive_dist - hardest_negative_dist + self.margin))
-        # return loss.mean()
+        else:
+            loss = (F.relu(hardest_positive_dist - hardest_negative_dist + self.margin))
+            return loss.mean()
 
 
 class MPerClassSampler(Sampler):
