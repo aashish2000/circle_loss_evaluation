@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from model import Model, set_bn_eval
-from utils import recall_precision, LabelSmoothingCrossEntropyLoss, BatchHardTripletLoss, ImageReader, MPerClassSampler
+from utils import recall_precision, LabelSmoothingCrossEntropyLoss, BatchHardTripletLoss, ImageReader, MPerClassSampler, SoftTriple
 
 # import torch.distributed as dist
 # dist.init_process_group('gloo', init_method='file:///tmp/somefile', rank=0, world_size=1)
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     parser.add_argument('--recalls', default='1,2,4,8', type=str, help='selected recall')
     parser.add_argument('--batch_size', default=128, type=int, help='train batch size')
     parser.add_argument('--num_epochs', default=20, type=int, help='train epoch number')
-    parser.add_argument('--loss_name', default="circle", type=str, help='Loss name', choices=["circle", "triplet"])
+    parser.add_argument('--loss_name', default="circle", type=str, help='Loss name', choices=["softtriple", "circle", "triplet"])
 
     opt = parser.parse_args()
     loss_name = opt.loss_name
@@ -131,10 +131,12 @@ if __name__ == '__main__':
     # flops, params = profile(model, inputs=(torch.randn(1, 3, 224, 224).cuda(),))
     # flops, params = clever_format([flops, params])
     # print('# Model Params: {} FLOPs: {}'.format(params, flops))
-    optimizer = Adam(model.parameters(), lr=1e-4, weight_decay=1e-8)
+    optimizer = Adam(model.parameters(), lr=1e-4, weight_decay=1e-9)
+    # optimizer = Adam(model.parameters(), lr=1e-4, weight_decay=1e-8)
     lr_scheduler = MultiStepLR(optimizer, milestones=[int(0.6 * num_epochs), int(0.8 * num_epochs)], gamma=0.1)
     class_criterion = LabelSmoothingCrossEntropyLoss(smoothing=smoothing, temperature=temperature)
-    feature_criterion = BatchHardTripletLoss(margin=margin, gamma=gamma, loss_name=loss_name)
+    # feature_criterion = BatchHardTripletLoss(margin=margin, gamma=gamma, loss_name=loss_name)
+    feature_criterion = SoftTriple(20, 0.1, 0.2, 0.01, opt.feature_dim, 98, 10).cuda()
 
     best_recall = 0.0
     best_prec = 0.0
