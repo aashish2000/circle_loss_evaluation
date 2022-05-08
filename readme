@@ -1,35 +1,5 @@
-make fθ unable to learn trivial associations. With this realization, the concept of hard batch triplet loss was proposed where the idea was to form batches by randomly sampling P classes and then randomly sampling K images of these classes to form a batch of PK images. Idea is to create a loss function which operates on mini-batch of samples such that each sample a is hardest (positive & negative) with respect to the mini-batch, but its effect remains moderate with respect to the whole batch PK. 
 
-The loss function is given by:
-
-
-
-which is defined for a mini-batch X and xij represents the j-th image in the i-th sample of the batch.
-
-4. Dataset
-For our initial task on Composed Image Retrieval, we used the CIRR dataset described below:
-
-a)	Composed Image Retrieval on Real-life Images (CIRR) dataset: Contains 36000 query-target pairs of crowd-sourced, open-domain images with human-generated modifying text. The dataset has challenging examples that require careful consideration of visual and textual cues. The modifying text is collected such that it distinguishes the target from a set of similar images, thus addressing the problem of false negatives that is prevalent in some existing datasets. 
-
-For analyzing Pair-wise Loss functions and benchmarking, we utilized the 2 major datasets:
- 
-b)	Caltech-UCSD Birds-200-2011 (CUB-200-2011) dataset: The dataset contains around 11,788 images that belong to 200 subcategories of birds, the dataset is split into 5994 training images and 5794 test images. The images are sourced from Flickr and manually annotated using Amazon Mechanical Turk. This dataset is primarily used for visual categorization tasks.
-
-c)	Stanford Cars196 dataset: The dataset contains around 16,185 images that belong to 196 classes of cars, the dataset is split into 8144 training images and 8041 test images. This dataset was created by Stanford University for testing image classification and retrieval tasks.
-
-
-5. Results
-We compare the unified loss function circle loss and traditional triplet loss for image retrieval task on CUB, CARS datasets. For performance benchmarking, we used Recall@k and Precision@k as our evaluation metrics.
-
-Recall@k: Recall@k is used to check the top k returned images of our model and verify if any 1 of those top k images contain the target image we wish to retrieve. for k values [1,2,4 and 8].
-
-Precision@k: Precision@k is the proportion of target images in the top-k returned images of our model that are relevant for k values [1,2,4 and 8].
-
-With respect to real-world performance monitoring of retrieval systems, recall cannot be used in isolation as it is hard to retrieve all relevant samples for a query when the number of samples are large. Thus, for scalable performance evaluation, precision is more appropriate. To holistically evaluate retrieval systems, we include both Precision@K and Recall@K
-
-We utilize the CGD feature extraction backbone for testing all pair-wise loss functions. We experiment with various global feature descriptors and hyperparameters for different datasets.
-
-Triplet loss Evaluation
+Triplet loss Results
 
 Stanford Cars Dataset (20 epochs):
 
@@ -47,18 +17,8 @@ CGD-Reg-1536 (ours)   88.55% 93.63% 95.86% 97.74%
 
 We evaluate Precision@k for k=[1,2,4,8] below:
 
-Model
-P@1
-P@2
-P@4
-P@8
-
-CGD-Reg-1536
-88.55%
-81.88%
-73.42%
-51.42%
-
+Model         P@1     P@2     P@4     P@8
+CGD-Reg-1536  88.55%  81.88%  73.42%  51.42%
 
 
 CUB Dataset (20 epochs):
@@ -68,45 +28,17 @@ Using the MG global feature descriptors, we construct an embedding dimension of 
 
 We describe our Recall@K performance results below:
 
-Model
-R@1
-R@2
-R@4
-R@8
-
-HTL-Inception
-57.1%
-68.8%
-78.7%
-86.5%
-
-CGD (base)
-66.0%
-76.4% 
-84.8%
-90.7%
-
-CGD-Reg-1536 (ours)
-66.9%
-77.48%
-85.03%
-90.56%
+Model                  R@1    R@2    R@4    R@8
+HTL-Inception          57.1%  68.8%  78.7%  86.5%
+CGD (base)             66.0%  76.4%  84.8%  90.7%
+CGD-Reg-1536 (ours)    66.9%  77.48% 85.03% 90.56%
 
 
 
 We evaluate Precision@k for k=[1,2,4,8] below:
 
-Model
-P@1
-P@2
-P@4
-P@8
-
-CGD-Reg-1536
-66.9%
-61.77%
-56.91%
-53.33%
+Model                P@1    P@2     P@4     P@8
+CGD-Reg-1536         66.9%  61.77%  56.91%  53.33%
 
 
 
@@ -119,46 +51,17 @@ Using the MG global feature descriptors, we construct an embedding dimension of 
 
 We describe our Recall@K performance results below:
 
-Model
-R@1
-R@2
-R@4
-R@8
-
-CL-Inception
-83.4%
-89.8%
-94.1%
-96.5%
-
-CGD (base)
-86.4%
-92.1% 
-95.6%
-97.5%
-
-CGD-Reg-CL-1536 (ours)
-84.68%
-90.59%
-94.21%
-96.63%
+Model                           R@1     R@2    R@4    R@8
+CL-Inception                    83.4%   89.8%  94.1%  96.5%
+CGD (base)                      86.4%   92.1%  95.6%  97.5%
+CGD-Reg-CL-1536 (ours)          84.68%  90.59% 94.21% 96.63%
 
 
 
 We evaluate Precision@k for k=[1,2,4,8] below:
 
-Model
-P@1
-P@2
-P@4
-P@8
-
-CGD-Reg-CL-1536
-84.68%
-76.2%
-66.67%
-58.2%
-
+Model            P@1     P@2    P@4    P@8
+CGD-Reg-CL-1536  84.68%  76.2%  66.67% 58.2%
 
 
 CUB Dataset (20 epochs):
@@ -168,12 +71,7 @@ Using the SMG global feature descriptors, we construct an embedding dimension of
 
 We describe our Recall@K performance results below:
 
-Model
-R@1
-R@2
-R@4
-R@8
-
-CL-Inception	66.7%	77.4%	86.2%	91.2%
-CGD (base)	66.0%	76.4%	84.8%	90.7%
+Model               R@1   R@2   R@4   R@8
+CL-Inception	       66.7%	77.4%	86.2%	91.2%
+CGD (base)	         66.0%	76.4%	84.8%	90.7%
 SMG-Reg-1536 (ours)	63.47%	74.30%	82.71%	89.24%
