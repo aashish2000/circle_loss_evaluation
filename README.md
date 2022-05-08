@@ -14,7 +14,7 @@ pip install thop
 are used in this repo.
 
 You should download these datasets by yourself, and extract them into `${data_path}` directory, make sure the dir names are 
-`car`, `cub`, `sop` and `isc`. Then run `data_utils.py` to preprocess them.
+`car`, `cub`. Then run `data_utils.py` to preprocess them.
 
 ## Usage
 ### Train CGD
