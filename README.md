@@ -11,8 +11,7 @@ pip install thop
 
 ## Datasets
 [CARS196](http://ai.stanford.edu/~jkrause/cars/car_dataset.html), [CUB200-2011](http://www.vision.caltech.edu/visipedia/CUB-200-2011.html), 
-[Standard Online Products](http://cvgl.stanford.edu/projects/lifted_struct/) and 
-[In-shop Clothes](http://mmlab.ie.cuhk.edu.hk/projects/DeepFashion/InShopRetrieval.html) are used in this repo.
+are used in this repo.
 
 You should download these datasets by yourself, and extract them into `${data_path}` directory, make sure the dir names are 
 `car`, `cub`, `sop` and `isc`. Then run `data_utils.py` to preprocess them.
