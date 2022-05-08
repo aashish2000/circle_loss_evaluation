@@ -4,7 +4,7 @@ Aashish Anantha Ramakrishnan, Manoj Kumar Angadi, Prapti Panigrahi, Sahil Ahmad
 
  
 
-##![image](https://user-images.githubusercontent.com/11198090/167319635-0c975812-0c6b-41ef-b8b3-4b23320256d6.png)
+![image](https://user-images.githubusercontent.com/11198090/167319635-0c975812-0c6b-41ef-b8b3-4b23320256d6.png)
 Figure 1. Image Representation space visualization [Image courtesy: Google]
 
 
