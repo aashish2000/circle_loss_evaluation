@@ -1,3 +1,7 @@
+##  Analyzing Pairwise Loss from a Deep Metric Learning Perspective
+Aashish Anantha Ramakrishnan, Manoj Kumar Angadi, Prapti Panigrahi, Sahil Ahmad
+{aza6352,mxa5887, pmp5425, sja5912}@psu.edu
+
 ## Requirements
 - [Anaconda](https://www.anaconda.com/download/)
 - [PyTorch](https://pytorch.org)
