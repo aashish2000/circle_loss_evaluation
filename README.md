@@ -6,6 +6,8 @@
 ##  Figure 1. Image Representation space visualization [Image courtesy: Google]
 
 
+
+
 ## Requirements
 - [Anaconda](https://www.anaconda.com/download/)
 - [PyTorch](https://pytorch.org)
