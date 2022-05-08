@@ -38,28 +38,10 @@ Using the MG global feature descriptors, we construct an embedding dimension of 
 
 We describe our Recall@K performance results below:
 
-Model	R@1
-R@2
-R@4
-R@8
-
-HTL-Inception
-81.4%
-88.0%
-92.7%
-95.7%
-
-CGD (base)
-86.4%
-92.1% 
-95.6%
-97.5%
-
-CGD-Reg-1536 (ours)
-88.55%
-93.63%
-95.86%
-97.74%
+Model	                R@1    R@2    R@4    R@8
+HTL-Inception.        81.4%  88.0%  92.7%  95.7%
+CGD (base)            86.4%  92.1%  95.6%  97.5%
+CGD-Reg-1536 (ours)   88.55% 93.63% 95.86% 97.74%
 
 
 
