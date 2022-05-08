@@ -3,7 +3,9 @@ Triplet loss Results
 
 Stanford Cars Dataset (20 epochs):
 
-Using the MG global feature descriptors, we construct an embedding dimension of size 1536. To prevent overfitting on our training dataset, we add L2 Regularization with a weight decay of 1e-8. We tuned the Triplet Loss margin to 0.4 and trained with a batch size of 128. 
+Using the MG global feature descriptors, we construct an embedding dimension of size 1536. 
+To prevent overfitting on our training dataset, we add L2 Regularization with a weight decay of 1e-8. We tuned the Triplet Loss margin to 0.4 
+and trained with a batch size of 128. 
 
 
 We describe our Recall@K performance results below:
@@ -46,7 +48,9 @@ Circle loss results
 
 Stanford Cars Dataset (20 epochs):
 
-Using the MG global feature descriptors, we construct an embedding dimension of size 1536.  To prevent overfitting on our training dataset, we add L2 Regularization with a weight decay of 1e-8. We tuned the Circle Loss margin to 0.4, set gamma = 10 and trained with a batch size of 128.
+Using the MG global feature descriptors, we construct an embedding dimension of size 1536. 
+To prevent overfitting on our training dataset, we add L2 Regularization with a weight decay of 1e-8. We tuned the Circle Loss margin to 0.4, 
+set gamma = 10 and trained with a batch size of 128.
 
 
 We describe our Recall@K performance results below:
