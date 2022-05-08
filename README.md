@@ -1,8 +1,3 @@
-# CGD
-A PyTorch implementation of CGD based on the paper [Combination of Multiple Global Descriptors for Image Retrieval](https://arxiv.org/abs/1903.10663v3).
-
-![Network Architecture image from the paper](results/structure.png)
-
 ## Requirements
 - [Anaconda](https://www.anaconda.com/download/)
 - [PyTorch](https://pytorch.org)
